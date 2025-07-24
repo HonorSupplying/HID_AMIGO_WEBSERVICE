@@ -1,6 +1,6 @@
 # HID Amigo Web Service 🚀
 
-A modern, beautiful web application for managing users, groups, and zones with a stunning glassmorphism UI inspired by Apple iOS.
+A modern, beautiful web application for managing users, groups, and zones.
 
 ---
 
