@@ -9,16 +9,13 @@ import {
   message,
 } from "antd";
 import React, { useState, useContext } from "react";
-import { useTranslation } from "next-i18next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { GetServerSideProps } from "next";
+import { LogoutOutlined } from "@ant-design/icons";
 import { ThemeContext } from "../../components/common/ThemeProvider";
 
 const { Option } = Select;
 
 export default function Setting() {
-  const { i18n, t } = useTranslation("common");
-  const [language, setLanguage] = useState(i18n.language || "en");
+  const [language, setLanguage] = useState("en");
   const { theme, setTheme, primaryColor, setPrimaryColor } =
     useContext(ThemeContext);
 
@@ -27,7 +24,7 @@ export default function Setting() {
     localStorage.setItem("theme", theme);
     localStorage.setItem("primaryColor", primaryColor);
     localStorage.setItem("language", language);
-    message.success(t("Settings saved!"));
+    message.success("Settings saved!");
   };
 
   // Restore from localStorage (optional, for first load)
@@ -39,34 +36,58 @@ export default function Setting() {
     if (savedColor) setPrimaryColor(savedColor);
     if (savedLang) {
       setLanguage(savedLang);
-      i18n.changeLanguage(savedLang);
     }
   }, []);
 
   const handleLanguageChange = (lng: string) => {
     setLanguage(lng);
-    i18n.changeLanguage(lng);
   };
 
   const handleThemeChange = (value: string) => {
     setTheme(value);
   };
 
+  // เพิ่ม logout function
+  const handleLogout = async () => {
+    try {
+      // Simulate logout (remove actual API call)
+      // const session = localStorage.getItem('session');
+      // if (session) {
+      //   await fetch(`http://192.168.1.99/logout.fcgi?session=${session}`, {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //   });
+      // }
+
+      // Simulate logout delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Clear localStorage
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("user");
+      localStorage.removeItem("session");
+
+      // Redirect to login page
+      window.location.href = "/login";
+    }
+  };
+
   return (
     <AdminLayout>
-      <Card
-        title={t("System Settings")}
-        style={{ maxWidth: 600, margin: "0 auto" }}
-      >
+      <Card title="System Settings" style={{ maxWidth: 600, margin: "0 auto" }}>
         <Form layout="vertical">
-          <Form.Item label={t("Language")}>
+          <Form.Item label="Language">
             <Select value={language} onChange={handleLanguageChange}>
               <Option value="en">English</Option>
               <Option value="th">ไทย</Option>
               <Option value="zh">中文 (China)</Option>
             </Select>
           </Form.Item>
-          <Form.Item label={t("Theme")}>
+          <Form.Item label="Theme">
             <Select
               value={theme}
               onChange={handleThemeChange}
@@ -77,7 +98,7 @@ export default function Setting() {
               <Option value="system">System</Option>
             </Select>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <span>{t("Primary Color") || "Primary Color"}:</span>
+              <span>Primary Color:</span>
               <ColorPicker
                 showText
                 value={primaryColor}
@@ -87,12 +108,19 @@ export default function Setting() {
             </div>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" onClick={handleSave}>
+            <Button
+              type="primary"
+              onClick={handleSave}
+              style={{ marginRight: 8 }}
+            >
               Save Settings
+            </Button>
+            <Button icon={<LogoutOutlined />} danger onClick={handleLogout}>
+              Logout
             </Button>
           </Form.Item>
         </Form>
-        <Card title={t("Information")} style={{ marginTop: 32 }}>
+        <Card title="Information" style={{ marginTop: 32 }}>
           <Descriptions column={1} bordered>
             <Descriptions.Item label="IP">192.168.1.100</Descriptions.Item>
             <Descriptions.Item label="License">HID-1234-5678</Descriptions.Item>
@@ -103,9 +131,3 @@ export default function Setting() {
     </AdminLayout>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => ({
-  props: {
-    ...(await serverSideTranslations(locale || "en", ["common"])),
-  },
-});
