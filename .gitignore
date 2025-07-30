@@ -83,3 +83,7 @@ backend/logs/
 frontend/.next/
 frontend/out/
 frontend/node_modules/
+
+# Large files
+frontend.zip
+*.zip
